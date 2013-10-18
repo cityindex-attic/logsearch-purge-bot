@@ -5,10 +5,10 @@ using System.Collections.Generic;
 using System.Net;
 using System.IO;
 using System.Globalization;
+
 // external references
 using ServiceStack.Text;
-
-
+using System.Threading;
 
 namespace LogstashPurge
 {
@@ -16,6 +16,7 @@ namespace LogstashPurge
 	{
 		public static void Main (string[] args)
 		{
+
 
 			// http://ec2-79-125-57-123.eu-west-1.compute.amazonaws.com:9200
 			// or, if you think i have the x-factor, plug in the live cluster ;)
@@ -28,41 +29,56 @@ namespace LogstashPurge
 				elasticSearchUrl = new Uri (args [0]);
 			}
 
-			var mapping = GetMappings (elasticSearchUrl);
-			var toDate = new DateTime (DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day).Subtract (TimeSpan.FromDays (28));
-			var toDateString = GetDayOnlyString (toDate);
+			IPAddress ip = GetExternalIP ();
 
 
-			mapping.Indices.Sort ();
-			foreach (var i in mapping.Indices) {
-
-				Console.WriteLine ("checking index {0}", i);
-				if (IndexExists (elasticSearchUrl, i)) {
-					var count = GetCount (elasticSearchUrl, i, toDateString);
-					if (count != 0) {
-						Console.WriteLine ("deleting {0} records", count);
-						Uri uri = new Uri (elasticSearchUrl, i + "/_query");
-
-						string range = GetRangeString (toDateString);
-						var queryBytes = Encoding.UTF8.GetBytes (range);
-						/*string responseText = */
-						GetResponseText (uri, "DELETE", queryBytes);
-
-						//{"ok":true,"_indices":{"logstash-2013.07.21":{"_shards":{"total":4,"successful":4,"failed":0}}}}
-					} else {
-						Console.WriteLine ("index {0} has no matching records", i);
+			TimeSpan wait;
+			while (true) {
+				Console.WriteLine ("\n\nstarting purge from IP {0} at {1}", ip, DateTime.UtcNow);
+				try {
+				
+					var mapping = GetMappings (elasticSearchUrl);
+					var toDate = new DateTime (DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day).Subtract (TimeSpan.FromDays (27));
+					var toDateString = GetDayOnlyString (toDate);
+				
+				
+					mapping.Indices.Sort ();
+					foreach (var i in mapping.Indices) {
+					
+						Console.WriteLine ("checking index {0}", i);
+						if (IndexExists (elasticSearchUrl, i)) {
+							var count = GetCount (elasticSearchUrl, i, toDateString);
+							if (count != 0) {
+								Console.WriteLine ("deleting {0} records", count);
+								Uri uri = new Uri (elasticSearchUrl, i + "/_query");
+							
+								string range = GetRangeString (toDateString);
+								var queryBytes = Encoding.UTF8.GetBytes (range);
+								/*string responseText = */
+								GetResponseText (uri, "DELETE", queryBytes);
+							
+								//{"ok":true,"_indices":{"logstash-2013.07.21":{"_shards":{"total":4,"successful":4,"failed":0}}}}
+							} else {
+								Console.WriteLine ("index {0} has no matching records", i);
+							}
+						
+							// then clean it up if empty
+							if (DeleteIndexIfEmpty (elasticSearchUrl, i)) {
+								Console.WriteLine ("deleted emtpy index {0}", i);
+							}
+						} else {
+							Console.WriteLine ("index {0} does not exist", i);
+						}
+					
 					}
-
-					// then clean it up if empty
-					if (DeleteIndexIfEmpty (elasticSearchUrl, i)) {
-						Console.WriteLine ("deleted emtpy index {0}", i);
-					}
-				} else {
-					Console.WriteLine ("index {0} does not exist", i);
+					wait = TimeSpan.FromDays (1);
+				} catch (Exception ex) {
+					Console.WriteLine ("ERROR:" + ex.ToString ());
+					wait = TimeSpan.FromMinutes (1);
 				}
-
+				Console.WriteLine ("\n\nwaiting {0} minutes until next purge", wait.TotalMinutes);
+				Thread.Sleep (wait);
 			}
-
 
 
 		}
@@ -196,6 +212,12 @@ namespace LogstashPurge
 			var ci = CultureInfo.InvariantCulture;
 			var toDateString = date1.ToString ("yyyy-MM-dd", ci) + "T00:00:00";
 			return toDateString;
+		}
+
+		public static IPAddress GetExternalIP ()
+		{
+			IPAddress ip = IPAddress.Parse (GetResponseText (new Uri ("http://api.externalip.net/ip"), "GET", null));
+			return ip;
 		}
 	}
 
