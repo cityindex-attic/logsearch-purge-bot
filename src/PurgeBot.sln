@@ -3,6 +3,11 @@ Microsoft Visual Studio Solution File, Format Version 11.00
 # Visual Studio 2010
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "PurgeBot", "PurgeBot\PurgeBot.csproj", "{63FA8A9D-04AE-469A-AAA5-7A30B4E0CB8F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "deploy", "deploy", "{45A99E49-4BA8-45D8-9E76-4B39DA69582E}"
+	ProjectSection(SolutionItems) = preProject
+		..\manifest.yml = ..\manifest.yml
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x86 = Debug|x86
@@ -13,6 +18,8 @@ Global
 		{63FA8A9D-04AE-469A-AAA5-7A30B4E0CB8F}.Debug|x86.Build.0 = Debug|x86
 		{63FA8A9D-04AE-469A-AAA5-7A30B4E0CB8F}.Release|x86.ActiveCfg = Release|x86
 		{63FA8A9D-04AE-469A-AAA5-7A30B4E0CB8F}.Release|x86.Build.0 = Release|x86
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
 	EndGlobalSection
 	GlobalSection(MonoDevelopProperties) = preSolution
 		StartupItem = PurgeBot\PurgeBot.csproj
