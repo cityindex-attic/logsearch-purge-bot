@@ -7,3 +7,4 @@ applications:
   path: ./_bin
   env:
     elasticSearchUrl: "http://ec2-79-125-57-123.eu-west-1.compute.amazonaws.com:9200"
+	daysToKeep: 30

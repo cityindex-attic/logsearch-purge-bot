@@ -22,11 +22,17 @@ namespace LogstashPurge
 			// or, if you think i have the x-factor, plug in the live cluster ;)
 
 			Uri elasticSearchUrl;
-
+		    int daysToKeep = 30;
 			if (args.Length == 0) {
 				elasticSearchUrl = new Uri (Environment.GetEnvironmentVariable ("elasticSearchUrl"));
+			    daysToKeep = int.Parse(Environment.GetEnvironmentVariable("daysToKeep"));
+
 			} else {
 				elasticSearchUrl = new Uri (args [0]);
+                if (args.Length > 1)
+                {
+                    daysToKeep = int.Parse(args[1]);
+                }
 			}
 
 			IPAddress ip = GetExternalIP ();
@@ -38,7 +44,7 @@ namespace LogstashPurge
 				try {
 				
 					var mapping = GetMappings (elasticSearchUrl);
-					var toDate = new DateTime (DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day).Subtract (TimeSpan.FromDays (27));
+					var toDate = new DateTime (DateTime.UtcNow.Year, DateTime.UtcNow.Month, DateTime.UtcNow.Day).Subtract (TimeSpan.FromDays (daysToKeep));
 					var toDateString = GetDayOnlyString (toDate);
 				
 				
