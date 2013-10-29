@@ -40,6 +40,7 @@
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <ItemGroup>
     <None Include="start_ssh_tunnel_tests.rb" />
+    <None Include="start_lumberjack_shipper_tests.rb" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PurgeBot\PurgeBot.csproj">

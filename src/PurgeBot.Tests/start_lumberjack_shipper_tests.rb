@@ -5,4 +5,4 @@ def sh_with_cf_env(cmd)
 	system(environment, cmd)
 end
 
-sh_with_cf_env('../PurgeBot/start_ssh_tunnel.rb "-L 127.0.0.1:9200:foo.com:9200"')
+sh_with_cf_env('../PurgeBot/start_lumberjack_shipper.rb "test-service" "sample.log" ')

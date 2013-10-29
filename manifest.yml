@@ -8,6 +8,8 @@ applications:
   services:
     logsearch-ppe-ssh_tunnel:
       type: user-provided
+    logsearch-ppe-lumberjack_endpoint:
+      type: user-provided
   env:
     elasticSearchUrl: "http://127.0.0.1:9200"
     daysToKeep: 90

@@ -1,2 +1,3 @@
-bot: mono --server logsearch-purge-bot.exe
+bot: sleep 10 && mono --server logsearch-purge-bot.exe | tee /home/vcap/logs/logsearch-purge-bot.log
 tunnel: ruby start_ssh_tunnel.rb "-L 127.0.0.1:9200:elasticsearch.srv-int.logsearch.cityindextest5.co.uk:9200"
+shipper: ruby start_lumberjack_shipper.rb "logsearch-purge-bot" "/home/vcap/logs/logsearch-purge-bot.log"

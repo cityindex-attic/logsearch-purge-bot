@@ -7,7 +7,8 @@ require 'pty'
 
 def get_service_credentials(service_name)
 	vcap_services = JSON.parse(ENV['VCAP_SERVICES'])
-	vcap_services["user-provided"][0]["credentials"]  #todo - dynamically find service_name
+	named_services = vcap_services['user-provided'].select { |item| item['name']==service_name }
+	named_services[0]['credentials'] 
 end
 
 def write_to_tmp_file(contents)
@@ -20,9 +21,10 @@ end
 
 puts "----> Extracting SSH credentials from ENV['VCAP_SERVICES']"
 
-uri = get_service_credentials("logsearch_ssh_tunnel")["uri"]
-ssh_private_key_path = write_to_tmp_file(Base64.decode64(get_service_credentials("logsearch_ssh_tunnel")["ssh_private_key_base64"]))
-ssh_known_hosts_path = write_to_tmp_file(Base64.decode64(get_service_credentials("logsearch_ssh_tunnel")["ssh_known_hosts_base64"]))
+credentials = get_service_credentials('logsearch-ppe-ssh_tunnel')
+uri = credentials["uri"]
+ssh_private_key_path = write_to_tmp_file(Base64.decode64(credentials["ssh_private_key_base64"]))
+ssh_known_hosts_path = write_to_tmp_file(Base64.decode64(credentials["ssh_known_hosts_base64"]))
 
 puts "----> Starting tunnel..."
 tunnel = ARGV[0]
