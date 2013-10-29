@@ -1,0 +1,2 @@
+bot: mono --server logsearch-purge-bot.exe
+tunnel: ruby start_ssh_tunnel.rb "-L 127.0.0.1:9200:elasticsearch.srv-int.logsearch.cityindextest5.co.uk:9200"
