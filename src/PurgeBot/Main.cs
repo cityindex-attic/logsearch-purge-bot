@@ -55,8 +55,7 @@ namespace LogstashPurge
 
             }
 
-            // http://ec2-79-125-57-123.eu-west-1.compute.amazonaws.com:9200
-            // or, if you think i have the x-factor, plug in the live cluster ;)
+ 
 
             Uri elasticSearchUrl;
             int daysToKeep = 30;
@@ -111,6 +110,7 @@ namespace LogstashPurge
                                 string range = GetRangeString(toDateString);
                                 var queryBytes = Encoding.UTF8.GetBytes(range);
                                 /*string responseText = */
+                                Console.WriteLine("delete query: {0}", range);
                                 GetResponseText(uri, "DELETE", queryBytes);
 
                                 //{"ok":true,"_indices":{"logstash-2013.07.21":{"_shards":{"total":4,"successful":4,"failed":0}}}}
